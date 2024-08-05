@@ -13,6 +13,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import Profile from "./pages/Profile";
 import { fetchVerify } from "./libs/fetcher";
 import Search from "./pages/Search";
+import Notis from "./pages/Notis";
+import AppSocket from "./AppSocket";
 
 const AppContext = createContext();
 export const queryClient = new QueryClient();
@@ -54,6 +56,11 @@ const router = createBrowserRouter([
       {
         path:"/search",
         element:<Search/>
+      },
+      {
+        path:"/notis",
+        element:<Notis/>
+
       }
     ],
   },
@@ -108,6 +115,7 @@ export default function ThemedApp() {
       >
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
+          <AppSocket/>
         </QueryClientProvider>
 
         <CssBaseline />

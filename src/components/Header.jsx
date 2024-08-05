@@ -1,6 +1,12 @@
-import { useApp } from "../ThemedApp";
 
-import { Box, AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import {
+ Box,
+ AppBar,
+ Toolbar,
+ Typography,
+ IconButton,
+ Badge,
+} from "@mui/material";
 
 import {
  Menu as MenuIcon,
@@ -9,16 +15,35 @@ import {
  DarkMode as DarkModeIcon,
  ArrowBack as BackIcon,
  Search as SearchIcon,
+ Notifications as NotiIcon,
 } from "@mui/icons-material";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "react-query";
+import { fetchNotis, fetchUser } from "../libs/fetcher";
+import { useApp } from "../ThemedApp";
 
 export default function Header() {
  const { setShowDrawer, showForm, setShowForm, mode, setMode, auth } =
   useApp();
-
  const { pathname } = useLocation();
  const navigate = useNavigate();
+
+
+ const { isLoading, isError, data } = useQuery(["notis", auth], fetchNotis);
+
+ function notiCount() {
+  if (!auth) return 0;
+  if (isLoading || isError) return 0;
+
+  return data.filter(noti => !noti.read).length;
+ }
+
+function getUserName(){
+    if(auth) {
+        return auth.name
+     }
+}
 
  return (
   <AppBar position="static">
@@ -39,7 +64,7 @@ export default function Header() {
      </IconButton>
     )}
 
-    <Typography sx={{ flexGrow: 1, ml: 2 }}>Min Cherry</Typography>
+    <Typography sx={{ flexGrow:1,fontSize:25,ml: 2 ,color:"green"}}>{auth && getUserName()}</Typography>
 
     <Box sx={{ display: "flex", gap: 1 }}>
      {auth && (
@@ -55,6 +80,18 @@ export default function Header() {
       onClick={() => navigate("/search")}>
       <SearchIcon />
      </IconButton>
+
+     {auth && (
+      <IconButton
+       color="inherit"
+       onClick={() => navigate("/notis")}>
+       <Badge
+        color="error"
+        badgeContent={notiCount()}>
+        <NotiIcon />
+       </Badge>
+      </IconButton>
+     )}
 
      {mode === "dark" ? (
       <IconButton

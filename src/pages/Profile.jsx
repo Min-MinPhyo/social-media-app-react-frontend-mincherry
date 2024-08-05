@@ -14,13 +14,11 @@ import { useParams } from "react-router-dom";
 import { fetchUser } from "../libs/fetcher";
 import { useQuery } from "react-query";
 import FollowButton from "../components/FollowButton";
+
 export default function Profile() {
   const { id } = useParams();
 
-  const { isLoading, isError, error, data, post, comment } = useQuery(
-    `users/${id}`,
-    async () => fetchUser(id)
-  );
+  const { isLoading, isError, error, data } = useQuery(`users/${id}`, async () => fetchUser(id));
 
   if (isError) {
     return (
@@ -29,9 +27,15 @@ export default function Profile() {
       </Box>
     );
   }
+
   if (isLoading) {
     return <Box sx={{ textAlign: "center" }}>Loading...</Box>;
   }
+
+  // Providing default values if `data` is undefined
+  const posts = data?.posts || [];
+  const comments = data?.comments || [];
+
   return (
     <Box>
       <Box sx={{ bgcolor: "banner", height: 150, borderRadius: 4 }}></Box>
@@ -55,16 +59,9 @@ export default function Profile() {
             {data.bio}
           </Typography>
 
-          <Typography sx={{alignItem:"center",justifyContent:"center",mt:3}}>
-            <FollowButton user={data}/>
+          <Typography sx={{ alignItem: "center", justifyContent: "center", mt: 3 }}>
+            <FollowButton user={data} />
           </Typography>
-
-
-         
-
-           
-         
-
 
           <Divider sx={{ marginTop: 5 }} />
 
@@ -73,8 +70,9 @@ export default function Profile() {
             <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
               Posts
             </Typography>
-            {data.posts.length > 0 ? (
-              data.posts.map((post) => (
+
+            {posts.length > 0 ? (
+              posts.map((post) => (
                 <Card
                   key={post.id}
                   sx={{
@@ -85,21 +83,15 @@ export default function Profile() {
                   }}
                 >
                   <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold",color:"green"}}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "green" }}>
                       {post.created}
                     </Typography>
-                    <Typography
-                      sx={{ fontSize: "30px", color: "green" }}
-                    >
-                      {post.content}
-                    </Typography>
+                    <Typography sx={{ fontSize: "30px", color: "green" }}>{post.content}</Typography>
                   </CardContent>
                 </Card>
               ))
             ) : (
-              <Typography sx={{ color: "red", fontSize: 20 }}>
-                No posts available
-              </Typography>
+              <Typography sx={{ color: "red", fontSize: 20 }}>No posts available</Typography>
             )}
           </Box>
 
@@ -108,8 +100,8 @@ export default function Profile() {
             <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
               Comments
             </Typography>
-            {data.comments.length > 0 ? (
-              data.comments.map((comment) => (
+            {comments.length > 0 ? (
+              comments.map((comment) => (
                 <Card
                   key={comment.id}
                   sx={{
@@ -120,21 +112,15 @@ export default function Profile() {
                   }}
                 >
                   <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold",color:"green" }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "green" }}>
                       {comment.created}
                     </Typography>
-                    <Typography
-                      sx={{ fontSize: "30px", color: "green" }}
-                    >
-                      {comment.content}
-                    </Typography>
+                    <Typography sx={{ fontSize: "30px", color: "green" }}>{comment.content}</Typography>
                   </CardContent>
                 </Card>
               ))
             ) : (
-              <Typography sx={{ color: "red", fontSize: 20 }}>
-                No comments available
-              </Typography>
+              <Typography sx={{ color: "red", fontSize: 20 }}>No comments available</Typography>
             )}
           </Box>
         </Box>
